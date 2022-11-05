@@ -1,0 +1,16 @@
+[
+{
+  "modid": "attackindicator",
+  "name": "LOTR Attack Indicator",
+  "description": "Adds the 1.9+ attack indicator to LOTR.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["jediexe"],
+  "credits": "LOTR team",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
