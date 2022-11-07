@@ -9,7 +9,7 @@
   "updateUrl": "",
   "authorList": ["jediexe"],
   "credits": "LOTR team",
-  "logoFile": "",
+  "logoFile": "icon.png",
   "screenshots": [],
   "dependencies": []
 }

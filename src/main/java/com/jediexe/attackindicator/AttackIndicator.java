@@ -1,58 +1,41 @@
 package com.jediexe.attackindicator;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.Color;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import lotr.client.LOTRAttackTiming;
-import lotr.client.LOTRTickHandlerClient;
 import lotr.common.item.LOTRWeaponStats;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
 
 public class AttackIndicator {
 
 	public static AttackIndicator instance = new AttackIndicator();
 	
+	public static ResourceLocation meterTexture = new ResourceLocation("attackindicator:gui/attackMeter.png");
+	public static ResourceLocation indicatorTexture = new ResourceLocation("attackindicator:gui/indicator.png");
+	public static RenderItem itemRenderer = new RenderItem();
 	public static Minecraft mc = Minecraft.getMinecraft();
 	
-	public static ResourceLocation meterTexture = new ResourceLocation("attackindicator:gui/attackMeter.png");
-	public static RenderItem itemRenderer = new RenderItem();
-	
+	int errorlog = 0;
+	String hex = "#" + Main.inrangeColor.toUpperCase();
+	float transparency = Main.transparency;
 	public boolean inrange = false;
 	ItemStack item;
-	
 	double lerpX;
 	double lerpU;
 	
 	@SubscribeEvent
 	public void renderIndicator(RenderGameOverlayEvent.Pre event) throws NullPointerException {
-		if (mc.theWorld != null && mc.thePlayer != null) {
+		if (mc.theWorld != null && mc.thePlayer != null && Loader.isModLoaded("lotr")) {
 			if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR) {
 				int minX = event.resolution.getScaledWidth() / 2 - 10;
 				int maxX = event.resolution.getScaledWidth() / 2 + 10;
@@ -78,8 +61,23 @@ public class AttackIndicator {
 					GL11.glPushMatrix();
 					GL11.glEnable(GL11.GL_BLEND);
 					Tessellator tessellator = Tessellator.instance;
-					mc.getTextureManager().bindTexture(meterTexture);
-					GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+					if (Main.showInrange) {
+						try {
+							mc.getTextureManager().bindTexture(indicatorTexture);
+							Color.decode(hex);
+						}
+						catch(NumberFormatException e) {
+							if (errorlog<1) {
+								System.err.println("No valid hex value provided in the config! Reverting to legacy texture.");
+							}
+							errorlog+=1;
+							mc.getTextureManager().bindTexture(meterTexture);
+						}
+					}
+					else if (!Main.showInrange) {
+						mc.getTextureManager().bindTexture(meterTexture);
+					}
+					GL11.glColor4f(1.0f, 1.0f, 1.0f, transparency);
 					tessellator.startDrawingQuads();
 					tessellator.addVertexWithUV(minX, minY, 0.0, minU, minV);
 					tessellator.addVertexWithUV(minX, maxY, 0.0, minU, maxV);
@@ -92,7 +90,16 @@ public class AttackIndicator {
 					tessellator.addVertexWithUV(maxX, maxY, 0.0, maxU, maxV + maxV);
 					tessellator.addVertexWithUV(maxX, minY, 0.0, maxU, minV + maxV);
 					tessellator.draw();
-					if (inrange==true && fullAttackTime==0) {
+					if (inrange==true && fullAttackTime==0 && Main.showInrange) {
+						try {
+							float Red = (Color.decode(hex).getRed())/255.0f;
+							float Green = (Color.decode(hex).getGreen())/255.0f;
+							float Blue = (Color.decode(hex).getBlue())/255.0f;
+							GL11.glColor4f(Red, Green, Blue, transparency);
+						}
+						catch (NumberFormatException e){
+							GL11.glColor4f(1.0f, 1.0f, 1.0f, transparency);
+						}
 						tessellator.startDrawingQuads();
 						tessellator.addVertexWithUV(minX, minY, 0.0, minU, minV + maxV * 2.0);
 						tessellator.addVertexWithUV(minX, maxY, 0.0, minU, maxV + maxV * 2.0);
@@ -104,7 +111,7 @@ public class AttackIndicator {
 					GL11.glPopMatrix();
 				}
 			}
-			if (event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS) {
+			if (event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && Main.showInrange) {
 				if (!Minecraft.getMinecraft().thePlayer.isOnLadder()) {
 					Entity entityhit = Minecraft.getMinecraft().objectMouseOver.entityHit;
 					if (entityhit!=null) {
