@@ -2,7 +2,7 @@
 {
   "modid": "attackindicator",
   "name": "LOTR Attack Indicator",
-  "description": "Adds the 1.9+ attack indicator to LOTR.",
+  "description": "Adds the 1.9+ attack indicator to LOTR. Shows indicator when in range and changes color if the entity is allied, enemied, neutral, or passive.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
