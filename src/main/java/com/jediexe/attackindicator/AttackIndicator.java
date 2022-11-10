@@ -2,6 +2,7 @@ package com.jediexe.attackindicator;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import lotr.client.LOTRAttackTiming;
@@ -17,6 +18,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.config.Configuration;
 
 public class AttackIndicator {
 
@@ -29,7 +31,7 @@ public class AttackIndicator {
 	public static RenderItem itemRenderer = new RenderItem();
 	public static Minecraft mc = Minecraft.getMinecraft();
 
-	float transparency = Main.transparency;
+	float transparency = (float)Main.transparency/10.0f;
 	public boolean inrange = false;
 	int alignment=10;
 	ItemStack item;
@@ -162,5 +164,11 @@ public class AttackIndicator {
 				}
 			}
 		}
+	}
+
+	public static void update() {
+		float transparency = (float)Main.transparency/10.0f;
+		double lerpX;
+		double lerpU;
 	}
 }

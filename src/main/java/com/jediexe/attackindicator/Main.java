@@ -1,50 +1,70 @@
 package com.jediexe.attackindicator;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import cpw.mods.fml.client.config.IConfigElement;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 
-@Mod(name = Main.NAME, modid = Main.MODID, version = Main.VERSION, acceptedMinecraftVersions = "[1.7.10]")
+@Mod(name = Main.NAME, modid = Main.MODID, version = Main.VERSION, acceptedMinecraftVersions = "[1.7.10]", guiFactory = "com.jediexe.attackindicator.IndicatorGuiFactory")
 
 public class Main{
 	
 	public static final String NAME = "LOTR Attack Indicator";
     public static final String MODID = "attackindicator";
-    public static final String VERSION = "1.4";
+    public static final String VERSION = "1.5";
     
     public static boolean showInrange;
     public static boolean changesColorBasedOnAlignment;
-    public static float transparency;
+    public static int transparency;
     public static int scale;
     public static int height;
     
-    public void initConfiguration(FMLInitializationEvent event) {
+    public static Configuration config = new Configuration(new File("config/attackindicator.cfg"));
+    
+    public static void load(Configuration config) {
+    	Property showInrangeP = config.get(Configuration.CATEGORY_GENERAL, "showInrange", true, "Show the indicator if an entity is in range");
+    	Property changesColorBasedOnAlignmentP = config.get(Configuration.CATEGORY_GENERAL, "changesColorBasedOnAlignment", true, "The indicator has different colors for allies, enemies, and neutrals by default. Set to false to disable");
+    	Property transparencyP = config.get(Configuration.CATEGORY_GENERAL, "transparency", 9, "The transparency of the indicator. 0 is the lowest and 10 is the highest. I recommend between 7 and 10.");
+    	Property scaleP = config.get(Configuration.CATEGORY_GENERAL, "scale", 2,  "The scale of the indicator. 1 is the lowest and 100 is the highest. I recommend 2 (small)");
+    	Property heightP = config.get(Configuration.CATEGORY_GENERAL, "height", 10, "The height of the indicator in relation to the crosshair. Negative is higher and positive is lower. I recommend 10 (just below crosshair)");
+    	showInrange = showInrangeP.getBoolean();
+    	changesColorBasedOnAlignment = changesColorBasedOnAlignmentP.getBoolean();
+    	transparency = transparencyP.getInt();
+    	scale = scaleP.getInt();
+    	height = heightP.getInt();
+    	if (config.hasChanged()) {
+            config.save();
+		}
+    }
+    
+    public static void setupAndLoad(FMLPreInitializationEvent event) {
     	Configuration config = new Configuration(new File("config/attackindicator.cfg"));
     	config.load();
-    	showInrange = config.getBoolean("showInrange", "config", true, 
-    			"Show the indicator if an entity is in range");
-    	changesColorBasedOnAlignment = config.getBoolean("changesColorBasedOnAlignment", "config", true, 
-    			"The indicator has different colors for allies, enemies, and neutrals by default. Set to false to disable");
-    	transparency = config.getFloat("transparency", "config", 0.9f, 0.0f, 1.0f, 
-    			"The transparency of the indicator. 0.0 is the lowest and 1.0 is the highest. "
-    			+ "I recommend between 0.7 and 1.0.");
-    	scale = config.getInt("scale", "config", 2, 1, 10, 
-    			"The scale of the indicator. 1 is the lowest and 100 is the highest. "
-    			+ "I recommend 2 (small)");
-    	height = config.getInt("height", "config", 10, -300, 300, 
-    			"The height of the indicator in relation to the crosshair. -300 is the highest and 300 is the lowest. "
-    			+ "I recommend 10 (just below crosshair)");
+    	Main.load(config);
     	config.save();
     }
     
-    @EventHandler
-    public void init(FMLInitializationEvent event){
-    	this.initConfiguration(event);
-    	MinecraftForge.EVENT_BUS.register(AttackIndicator.instance);
+	@EventHandler
+    public void preinit(FMLPreInitializationEvent event){
+    	Main.setupAndLoad(event);
     }
-    
+	
+	@EventHandler
+	public void init(FMLInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(AttackIndicator.instance);
+		FMLCommonHandler.instance().bus().register(new ConfigChangedHandler());
+	}
 }
