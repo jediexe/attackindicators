@@ -24,15 +24,20 @@ public class Main{
 	
 	public static final String NAME = "LOTR Attack Indicator";
     public static final String MODID = "attackindicator";
-    public static final String VERSION = "1.5";
+    public static final String VERSION = "1.5.1";
+    
+    public static Configuration config = new Configuration(new File("config/indicator.cfg"));
+    Property showInrangeP = config.get(Configuration.CATEGORY_GENERAL, "showInrange", true, "Show the indicator if an entity is in range");
+	Property changesColorBasedOnAlignmentP = config.get(Configuration.CATEGORY_GENERAL, "changesColorBasedOnAlignment", true, "The indicator has different colors for allies, enemies, and neutrals by default. Set to false to disable");
+	Property transparencyP = config.get(Configuration.CATEGORY_GENERAL, "transparency", 9, "The transparency of the indicator. 0 is the lowest and 10 is the highest. I recommend between 7 and 10.");
+	Property scaleP = config.get(Configuration.CATEGORY_GENERAL, "scale", 2,  "The scale of the indicator. 1 is the lowest and 100 is the highest. I recommend 2 (small)");
+	Property heightP = config.get(Configuration.CATEGORY_GENERAL, "height", 10, "The height of the indicator in relation to the crosshair. Negative is higher and positive is lower. I recommend 10 (just below crosshair)");
     
     public static boolean showInrange;
     public static boolean changesColorBasedOnAlignment;
     public static int transparency;
     public static int scale;
     public static int height;
-    
-    public static Configuration config = new Configuration(new File("config/attackindicator.cfg"));
     
     public static void load(Configuration config) {
     	Property showInrangeP = config.get(Configuration.CATEGORY_GENERAL, "showInrange", true, "Show the indicator if an entity is in range");
@@ -51,10 +56,8 @@ public class Main{
     }
     
     public static void setupAndLoad(FMLPreInitializationEvent event) {
-    	Configuration config = new Configuration(new File("config/attackindicator.cfg"));
     	config.load();
     	Main.load(config);
-    	config.save();
     }
     
 	@EventHandler

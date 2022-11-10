@@ -14,7 +14,7 @@ public class IndicatorGuiConfig extends GuiConfig {
 	public IndicatorGuiConfig(GuiScreen parentScreen) {
 		super(parentScreen, 
 				new ConfigElement(Main.config.getCategory(Configuration.CATEGORY_GENERAL)).getChildElements(), Main.MODID, 
-				false, false, GuiConfig.getAbridgedConfigPath(Main.config.toString()));
+				false, false, Main.MODID);
 	}
 	
 }
