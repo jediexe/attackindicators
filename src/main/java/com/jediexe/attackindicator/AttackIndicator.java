@@ -136,26 +136,41 @@ public class AttackIndicator {
 			}
 			if (event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && Main.showInrange) {
 				if (!Minecraft.getMinecraft().thePlayer.isOnLadder()) {
-					Entity entityhit = Minecraft.getMinecraft().objectMouseOver.entityHit;
-					if (entityhit!=null && entityhit!=mc.thePlayer) {
-						if (Minecraft.getMinecraft().thePlayer.isRiding()) {
-							if (Minecraft.getMinecraft().thePlayer.ridingEntity!=null) {
-								if (entityhit==Minecraft.getMinecraft().thePlayer.ridingEntity) {
-									inrange = false;
+					if (Minecraft.getMinecraft().objectMouseOver.entityHit!=null) {
+						if (Minecraft.getMinecraft().objectMouseOver.entityHit.getEntityId()!=mc.thePlayer.getEntityId()) {
+							String name = Minecraft.getMinecraft().objectMouseOver.entityHit.getCommandSenderName();
+							String entitytype = name;
+							if (name.contains(", the ")) {
+								String[] entityname = name.split(", the ", 2);
+								entitytype = entityname[1];
+							}
+							if (!Main.blacklistedEntities.toString().contains(entitytype)) {
+								if (Minecraft.getMinecraft().thePlayer.isRiding()) {
+									if (Minecraft.getMinecraft().thePlayer.ridingEntity!=null) {
+										if (Minecraft.getMinecraft().objectMouseOver.entityHit==Minecraft.getMinecraft().thePlayer.ridingEntity) {
+											inrange = false;
+										}
+										else {
+											inrange = true;
+											entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
+										}
+									}
+									else {
+										inrange = true;
+										entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
+									}
 								}
 								else {
 									inrange = true;
-									entityhitAlignment(entityhit);
+									entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
 								}
 							}
 							else {
-								inrange = true;
-								entityhitAlignment(entityhit);
+								inrange = false;
 							}
 						}
 						else {
-							inrange = true;
-							entityhitAlignment(entityhit);
+							inrange = false;
 						}
 					}
 					else {

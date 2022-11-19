@@ -8,6 +8,6 @@ The attack indicator is displayed when an entity is within reach (works with inc
 ![1 (1)](https://user-images.githubusercontent.com/47288669/200147593-f6e6a8d9-53c8-43d3-89e4-203d7d2c53e3.gif)
 ![2](https://user-images.githubusercontent.com/47288669/200147598-f677aa8d-0635-4517-87ed-49a1913395d2.gif)
 
-Config file can be accessed from 'Menu > Mods > LOTR Attack Indicator > Config' with options to show the indicator if an entity is in range, show different color indicators for allied, enemy, and neutral mobs, and options to set the transparency, scale, and height of the indicator.
+Config file can be accessed from 'Menu > Mods > LOTR Attack Indicator > Config' with options to show the indicator if an entity is in range, show different color indicators for allied, enemy, and neutral mobs, and options to set the transparency, scale, and height of the indicator. Entity names (ex 'Mordor Orc') can be added to the blacklist in the config to prevent the in-range indicator from showing over certain entities.
 
 Feel free to use this mod in your modpacks as long as you credit me (jediexe) and link this page. This mod works on client side. It will not work without either the LOTR mod or the LOTR First Age mod. Compatible with LOTR legacy mod and LOTR FA legacy mod (tested both). If you find any incompatibilities or bugs, please report them.
