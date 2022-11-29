@@ -135,20 +135,26 @@ public class AttackIndicator {
 				}
 			}
 			if (event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && Main.showInrange) {
-				if (!Minecraft.getMinecraft().thePlayer.isOnLadder()) {
-					if (Minecraft.getMinecraft().objectMouseOver.entityHit!=null) {
-						if (Minecraft.getMinecraft().objectMouseOver.entityHit.getEntityId()!=mc.thePlayer.getEntityId()) {
-							String name = Minecraft.getMinecraft().objectMouseOver.entityHit.getCommandSenderName();
-							String entitytype = name;
-							if (name.contains(", the ")) {
-								String[] entityname = name.split(", the ", 2);
-								entitytype = entityname[1];
-							}
-							if (!Main.blacklistedEntities.toString().contains(entitytype)) {
-								if (Minecraft.getMinecraft().thePlayer.isRiding()) {
-									if (Minecraft.getMinecraft().thePlayer.ridingEntity!=null) {
-										if (Minecraft.getMinecraft().objectMouseOver.entityHit==Minecraft.getMinecraft().thePlayer.ridingEntity) {
-											inrange = false;
+				if ((Minecraft.getMinecraft().thePlayer.capabilities.isFlying && Main.whileFlying) || !Minecraft.getMinecraft().thePlayer.capabilities.isFlying) {
+					if (!Minecraft.getMinecraft().thePlayer.isOnLadder()) {
+						if (Minecraft.getMinecraft().objectMouseOver.entityHit!=null) {
+							if (Minecraft.getMinecraft().objectMouseOver.entityHit.getEntityId()!=mc.thePlayer.getEntityId()) {
+								String name = Minecraft.getMinecraft().objectMouseOver.entityHit.getCommandSenderName();
+								String entitytype = name;
+								if (name.contains(", the ")) {
+									String[] entityname = name.split(", the ", 2);
+									entitytype = entityname[1];
+								}
+								if (!Main.blacklistedEntities.toString().contains(entitytype)) {
+									if (Minecraft.getMinecraft().thePlayer.isRiding()) {
+										if (Minecraft.getMinecraft().thePlayer.ridingEntity!=null) {
+											if (Minecraft.getMinecraft().objectMouseOver.entityHit==Minecraft.getMinecraft().thePlayer.ridingEntity) {
+												inrange = false;
+											}
+											else {
+												inrange = true;
+												entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
+											}
 										}
 										else {
 											inrange = true;
@@ -161,8 +167,7 @@ public class AttackIndicator {
 									}
 								}
 								else {
-									inrange = true;
-									entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
+									inrange = false;
 								}
 							}
 							else {
@@ -176,6 +181,9 @@ public class AttackIndicator {
 					else {
 						inrange = false;
 					}
+				}
+				else {
+					inrange = false;
 				}
 			}
 		}
