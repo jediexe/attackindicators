@@ -134,22 +134,26 @@ public class AttackIndicator {
 					GL11.glPopMatrix();
 				}
 			}
-			if (event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && Main.showInrange) {
-				if ((Minecraft.getMinecraft().thePlayer.capabilities.isFlying && Main.whileFlying) || !Minecraft.getMinecraft().thePlayer.capabilities.isFlying) {
-					if (!Minecraft.getMinecraft().thePlayer.isOnLadder()) {
-						if (Minecraft.getMinecraft().objectMouseOver.entityHit!=null) {
-							if (Minecraft.getMinecraft().objectMouseOver.entityHit.getEntityId()!=mc.thePlayer.getEntityId()) {
-								String name = Minecraft.getMinecraft().objectMouseOver.entityHit.getCommandSenderName();
-								String entitytype = name;
-								if (name.contains(", the ")) {
-									String[] entityname = name.split(", the ", 2);
-									entitytype = entityname[1];
-								}
-								if (!Main.blacklistedEntities.toString().contains(entitytype)) {
-									if (Minecraft.getMinecraft().thePlayer.isRiding()) {
-										if (Minecraft.getMinecraft().thePlayer.ridingEntity!=null) {
-											if (Minecraft.getMinecraft().objectMouseOver.entityHit==Minecraft.getMinecraft().thePlayer.ridingEntity) {
-												inrange = false;
+			if (event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && Main.showInrange && mc.thePlayer!=null && mc.theWorld!=null) {
+				if ((mc.thePlayer.capabilities.isFlying && Main.whileFlying ) || !mc.thePlayer.capabilities.isFlying) {
+					if (!mc.thePlayer.isOnLadder()) {
+						if (mc.objectMouseOver!=null) {
+							if (mc.objectMouseOver.entityHit!=null) {
+								if (mc.objectMouseOver.entityHit!=(Entity)mc.thePlayer) {
+									String name = mc.objectMouseOver.entityHit.getCommandSenderName();
+									String entitytype = name;
+									if (name.contains(", the ")) {
+										String[] entityname = name.split(", the ", 2);
+										entitytype = entityname[1];
+									}
+									if (!Main.blacklistedEntities.toString().contains(entitytype)) {
+										if (mc.thePlayer.isRiding()) {
+											if (mc.thePlayer.ridingEntity!=null) {
+												if (mc.objectMouseOver.entityHit!=mc.thePlayer.ridingEntity) {
+													inrange = true;
+													entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
+												}
+												else inrange = false;
 											}
 											else {
 												inrange = true;
@@ -161,30 +165,17 @@ public class AttackIndicator {
 											entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
 										}
 									}
-									else {
-										inrange = true;
-										entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
-									}
+									else inrange = false;
 								}
-								else {
-									inrange = false;
-								}
+								else inrange = false;
 							}
-							else {
-								inrange = false;
-							}
+							else inrange=false;
 						}
-						else {
-							inrange = false;
-						}
+						else inrange = false;
 					}
-					else {
-						inrange = false;
-					}
+					else inrange = false;
 				}
-				else {
-					inrange = false;
-				}
+				else inrange = false;
 			}
 		}
 	}

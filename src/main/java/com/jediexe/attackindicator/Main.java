@@ -24,7 +24,7 @@ public class Main{
 	
 	public static final String NAME = "LOTR Attack Indicator";
     public static final String MODID = "attackindicator";
-    public static final String VERSION = "1.6.1";
+    public static final String VERSION = "1.6.2";
     
     public static Configuration config = new Configuration(new File("config/indicator.cfg"));
     Property showInrangeP = config.get(Configuration.CATEGORY_GENERAL, "showInrange", true, "Show the indicator if an entity is in range");
