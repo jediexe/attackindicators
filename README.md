@@ -1,5 +1,5 @@
 # attackindicators
-Made for LOTR 36.14 legacy on Minecraft version 1.7.10.
+Made for LOTR 36.15 legacy on Minecraft version 1.7.10.
 
 This LOTR addon adds the 1.9+ combat attack indicator to the LOTR legacy mod.
 
