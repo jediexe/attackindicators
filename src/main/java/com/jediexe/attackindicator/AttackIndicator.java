@@ -2,23 +2,29 @@ package com.jediexe.attackindicator;
 
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import lotr.client.LOTRAttackTiming;
+import lotr.client.LOTRTickHandlerClient;
+import lotr.common.LOTRConfig;
 import lotr.common.LOTRLevelData;
 import lotr.common.LOTRMod;
+import lotr.common.LOTRPlayerData;
 import lotr.common.entity.npc.LOTREntityNPC;
+import lotr.common.fac.LOTRAlignmentValues;
 import lotr.common.fac.LOTRFaction;
 import lotr.common.item.LOTRWeaponStats;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.common.config.Configuration;
 
 public class AttackIndicator {
 
@@ -38,7 +44,15 @@ public class AttackIndicator {
 	double lerpX;
 	double lerpU;
 	
-	public void entityhitAlignment (Entity entity){
+	public void entityhitAlignment (Entity entity) throws NullPointerException {
+		if (mc==null) return;
+		if (entity==null) return;
+		if (mc.thePlayer==null) return;
+		if (entity==mc.thePlayer) return;
+		if (mc.objectMouseOver==null) return;
+		if (mc.thePlayer.isOnLadder()) return;		
+		if (mc.objectMouseOver.entityHit==null) return;
+		if (mc.objectMouseOver.entityHit==mc.thePlayer) return;
 		if (entity instanceof LOTREntityNPC) {
 			LOTRFaction entityfaction = LOTRMod.getNPCFaction(entity);
 			if (LOTRLevelData.getData(mc.thePlayer).getAlignment(entityfaction)<0.0) {
@@ -60,6 +74,19 @@ public class AttackIndicator {
 	public void renderIndicator(RenderGameOverlayEvent.Pre event) throws NullPointerException {
 		if (mc.theWorld != null && mc.thePlayer != null && Loader.isModLoaded("lotr")) {
 			if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR) {
+				if (Main.showAlignment) {
+					if (FMLClientHandler.instance().isGUIOpen(GuiChat.class) || mc.currentScreen != null) return;
+					LOTRPlayerData pd = LOTRLevelData.getData(mc.thePlayer);
+					ScaledResolution resolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+					int width = resolution.getScaledWidth();
+					resolution.getScaledHeight();
+					int x = width / 2 + LOTRConfig.alignmentXOffset;
+					int y = 4 + LOTRConfig.alignmentYOffset;
+					int textX = Math.round(x);
+					int textY = Math.round(y + 27.0f + 4.0F);
+					String align = LOTRAlignmentValues.formatAlignForDisplay(pd.getAlignment(pd.getViewingFaction())) + "";
+					LOTRTickHandlerClient.drawAlignmentText(mc.fontRenderer, textX - mc.fontRenderer.getStringWidth(align) / 2, textY + mc.fontRenderer.FONT_HEIGHT + 3, align, 1.0f);
+				}
 				int minX = event.resolution.getScaledWidth() / 2 - (Main.scale)*5;
 				int maxX = event.resolution.getScaledWidth() / 2 + (Main.scale)*5;
 				int maxY = event.resolution.getScaledHeight() / 2 + (Main.height);
@@ -134,48 +161,49 @@ public class AttackIndicator {
 					GL11.glPopMatrix();
 				}
 			}
-			if (event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && Main.showInrange && mc.thePlayer!=null && mc.theWorld!=null) {
-				if ((mc.thePlayer.capabilities.isFlying && Main.whileFlying ) || !mc.thePlayer.capabilities.isFlying) {
-					if (!mc.thePlayer.isOnLadder()) {
-						if (mc.objectMouseOver!=null) {
-							if (mc.objectMouseOver.entityHit!=null) {
-								if (mc.objectMouseOver.entityHit!=(Entity)mc.thePlayer) {
-									String name = mc.objectMouseOver.entityHit.getCommandSenderName();
-									String entitytype = name;
-									if (name.contains(", the ")) {
-										String[] entityname = name.split(", the ", 2);
-										entitytype = entityname[1];
-									}
-									if (!Main.blacklistedEntities.toString().contains(entitytype)) {
-										if (mc.thePlayer.isRiding()) {
-											if (mc.thePlayer.ridingEntity!=null) {
-												if (mc.objectMouseOver.entityHit!=mc.thePlayer.ridingEntity) {
-													inrange = true;
-													entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
-												}
-												else inrange = false;
-											}
-											else {
-												inrange = true;
-												entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
-											}
-										}
-										else {
-											inrange = true;
-											entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
-										}
-									}
-									else inrange = false;
-								}
-								else inrange = false;
-							}
-							else inrange=false;
-						}
-						else inrange = false;
-					}
-					else inrange = false;
+			try {
+				if (mc==null) return;
+				if (mc.thePlayer==null) return;
+				if (mc.objectMouseOver==null) return;
+				if (mc.objectMouseOver.entityHit==null) {
+					inrange = false;
+					return;
 				}
-				else inrange = false;
+				if (mc.objectMouseOver.entityHit==mc.thePlayer) {
+					inrange = false;
+					return;
+				}
+				if (!mc.objectMouseOver.entityHit.isEntityAlive()) {
+					inrange = false;
+					return;
+				}
+				if (event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS && Main.showInrange) {
+					if ((mc.thePlayer.capabilities.isFlying && Main.whileFlying ) || !mc.thePlayer.capabilities.isFlying) {
+						if (mc.objectMouseOver.entityHit.getCommandSenderName()==null) return;
+						String name = mc.objectMouseOver.entityHit.getCommandSenderName();
+						String entitytype = name;
+						if (name.contains(", the ")) {
+							String[] entityname = name.split(", the ", 2);
+							entitytype = entityname[1];
+						}
+						if (Main.blacklistedEntities.toString().contains(entitytype)) return;
+						if (mc.thePlayer.isRiding()) {
+							if (mc.thePlayer.ridingEntity==null) return;
+							if (mc.objectMouseOver.entityHit==mc.thePlayer.ridingEntity) return;
+							if (mc.objectMouseOver.entityHit!=mc.thePlayer) return;
+							inrange = true;
+							entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
+						}
+						if (!mc.thePlayer.isRiding()){
+							inrange = true;
+							entityhitAlignment(Minecraft.getMinecraft().objectMouseOver.entityHit);
+						}
+					}
+				}
+			}
+			catch (Exception e) {
+				inrange = false;
+				System.err.println(e);
 			}
 		}
 	}
