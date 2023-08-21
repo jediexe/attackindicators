@@ -17,7 +17,7 @@ public class Main {
 	
 	public static final String NAME = "LOTR Attack Indicator";
     public static final String MODID = "attackindicator";
-    public static final String VERSION = "1.6.3";
+    public static final String VERSION = "1.6.4";
     
     public static Configuration config = new Configuration(new File("config/indicator.cfg"));
 
@@ -25,6 +25,7 @@ public class Main {
     public static boolean changesColorBasedOnAlignment;
     public static boolean whileFlying;
     public static boolean showAlignment;
+    public static boolean showTraderCoords;
     public static int transparency;
     public static int scale;
     public static int height;
@@ -39,6 +40,8 @@ public class Main {
     	whileFlying = whileFlyingP.getBoolean();
     	Property showAlignmentP = config.get(Configuration.CATEGORY_GENERAL, "showAlignment", true, "QOL show exact alignment value under the alignment bar (in this mod until I can make a new addon)");
     	showAlignment = showAlignmentP.getBoolean();
+    	Property showTraderCoordsP = config.get(Configuration.CATEGORY_GENERAL, "showTraderCoords", true, "QOL show trader coords when one spawns nearby (in this mod until I can make a new addon)");
+    	showTraderCoords = showTraderCoordsP.getBoolean();
     	Property transparencyP = config.get(Configuration.CATEGORY_GENERAL, "transparency", 8, "The transparency of the indicator. 0 is the lowest and 10 is the highest. I recommend between 7 and 10.");
     	transparency = transparencyP.getInt();
     	Property scaleP = config.get(Configuration.CATEGORY_GENERAL, "scale", 2,  "The scale of the indicator. 1 is the lowest and 100 is the highest. I recommend 2 (small)");

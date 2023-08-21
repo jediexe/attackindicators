@@ -2,8 +2,8 @@
 {
   "modid": "attackindicator",
   "name": "LOTR Attack Indicator",
-  "description": "Adds the 1.9+ attack indicator to LOTR. Shows indicator when in range and changes color if the entity is allied, enemied, neutral, or passive.",
-  "version": "1.6.3",
+  "description": "Adds the 1.9+ attack indicator to LOTR. Shows indicator when in range and changes color if the entity is allied, enemy, neutral, or passive. Adds exact alignment viewer under the alignment bar. Adds coordinate tracker for spawned traders.",
+  "version": "1.6.4",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
