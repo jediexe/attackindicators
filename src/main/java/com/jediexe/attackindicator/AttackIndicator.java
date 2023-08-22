@@ -236,11 +236,9 @@ public class AttackIndicator {
 				Entity e = (Entity)mc.theWorld.loadedEntityList.get(i);
 				if (e instanceof LOTRTradeable) {
 					String tradername = msg.split(" has arrived near")[0];
-					System.out.println(tradername);
 					if (e.toString().contains(tradername)) {
 						event.setCanceled(true);
-						System.out.println(e);
-						mc.thePlayer.addChatMessage(new ChatComponentText(event.message.getFormattedText() + " at: \2473x" + Math.round(e.posX) + " y" + Math.round(e.posY) + " z" + Math.round(e.posZ)));
+						mc.thePlayer.addChatMessage(new ChatComponentText(event.message.getFormattedText() + " at: \2473" + Math.round(e.posX) + ", " + Math.round(e.posY) + ", " + Math.round(e.posZ)));
 					}
 				}
 			}
